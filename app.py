@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, jsonify
 from flask_cors import CORS
 
@@ -18,3 +19,7 @@ def index():
 
 if __name__ == '__main__':
     app.run()
+=======
+from app import app
+
+>>>>>>> master
