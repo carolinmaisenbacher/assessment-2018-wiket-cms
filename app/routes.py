@@ -15,8 +15,8 @@ def index():
 def create_user():
     if not request.json or not 'password' in request.json or not 'username' in request.json:
         abort(400)
-    username = request.json['username']
-    if username == "":
+    username = request.json['username'].strip()
+    if not username:
         make_response(jsonify({"error": "You have to provide a Username"}), 401)
     
     # check if user exists already
@@ -30,9 +30,10 @@ def create_user():
    
     if not password:
         return make_response(jsonify({"error": "You have to provide a Password"}), 401)
-    
-    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-    new_user = User(username, hashed)
+     
+    new_user = User(username, password)
+    print(new_user.username)
+    print(new_user.hashed_password)
     users.append(new_user)
 
     string_of_users =  ''
@@ -40,6 +41,8 @@ def create_user():
         string_of_users += user.username
 
     return make_response(jsonify({"userId": user.username, "all_users": string_of_users}))
+
+
 
 @app.route("/login", methods=["POST"])
 def signin():
@@ -57,19 +60,20 @@ def signin():
         return make_response(jsonify({"error": "Username or passowrd incorrect!"}), 401)
 
     # check it correct password
-    if bcrypt.checkpw(password.encode(), user.hashed_password):
+    if user.check_password(password):
         return make_response(jsonify({"userId" : user.username}), 200) 
 
     else:  
         return make_response(jsonify({"error": "Username or password incorrect"}), 401)
 
 class User ():
-    def __init__(self, username, hashed_password):
+    def __init__(self, username, password):
         self.username = username
-        self.hashed_password = hashed_password
+        self.hashed_password = ""
+        self.set_password(password)
 
-    def getHashedPassword():
-        return self.hashed_password
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode(), self.hashed_password)
 
-    def getUsername():
-        return self.username
+    def set_password(self, password):
+        self.hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
