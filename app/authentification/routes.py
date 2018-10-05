@@ -1,17 +1,10 @@
-# your routes live here
-from app import app
+from app.authentification import blueprint
 from flask import request, abort, jsonify, make_response
 import bcrypt
 
-users= []
+users = []
 
-
-@app.route("/")
-def index():
-    return "Hello"
-    
-    
-@app.route("/signup", methods=["POST"])
+@blueprint.route("/signup", methods=["POST"])
 def create_user():
     if not request.json or not 'password' in request.json or not 'username' in request.json:
         abort(400)
@@ -32,8 +25,6 @@ def create_user():
         return make_response(jsonify({"error": "You have to provide a Password"}), 401)
      
     new_user = User(username, password)
-    print(new_user.username)
-    print(new_user.hashed_password)
     users.append(new_user)
 
     string_of_users =  ''
@@ -44,8 +35,8 @@ def create_user():
 
 
 
-@app.route("/login", methods=["POST"])
-def signin():
+@blueprint.route("/login", methods=["POST"])
+def login():
     if not request.json or not 'password' in request.json or not 'username' in request.json:
         abort(400)
     password = request.json['password']
