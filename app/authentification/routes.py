@@ -1,9 +1,11 @@
 from app.authentification import blueprint
 from flask import request, abort, jsonify, make_response
+from app.authentification.sessions import Sessions
 import bcrypt
 
 users = []   
 id_counter = 0
+sessions = Sessions()
 
 @blueprint.route("/signup", methods=["POST"])
 def create_user():
@@ -13,18 +15,24 @@ def create_user():
     if not email:
         return make_response(jsonify({"error": "You have to provide a valid Email"}), 401)
 
-    if User.find(email):
-        return make_response(jsonify({"error": "You already exist, please log in"}), 401)
-
     password = request.json['password']
-   
+
     if not password:
         return make_response(jsonify({"error": "You have to provide a Password"}), 401)
+   
+    if User.find(email):
+        return make_response(jsonify({"error": "You already exist, please log in"}), 401)
 
     new_user = User(email, password)
     users.append(new_user)
 
-    return make_response(jsonify({"userId": new_user.id}), 201)
+
+    response = make_response(jsonify({"userId": new_user.id}), 201)
+    # response.headers["Set-Cookie"] = f"sessionId={sessionId}"
+    sessionId = sessions.create(new_user.id)
+    response.set_cookie("sessionId", value = sessionId)
+
+    return response
 
 
 
@@ -33,16 +41,19 @@ def login():
     if not request.json or not 'password' in request.json or not 'email' in request.json:
         abort(400)
     password = request.json['password']
+    email = request.json['email'] 
 
-    if not User.find(email):
+    user = User.find(email)
+    if not user:
         return make_response(jsonify({"error": "Username or passowrd incorrect!"}), 401)
 
-    if user.check_password(password):
-        return make_response(jsonify({"userId" : user.userId}), 200) 
-
-    else:  
+    if not user.check_password(password):  
         return make_response(jsonify({"error": "Username or password incorrect"}), 401)
 
+    response = make_response(jsonify({"userId" : user.id}), 200) 
+    sessionId = sessions.create(user.id)
+    response.set_cookie("sessionId", value = sessionId)
+    return response
 
 
 class User ():
@@ -69,7 +80,6 @@ class User ():
         for user in users:
             if user.email == email:
                 return user
-
 
 
 
