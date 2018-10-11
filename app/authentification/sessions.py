@@ -1,8 +1,5 @@
 from os import urandom
 
-
-
-
 class Sessions():
     def __init__(self):
         self.sessions = {}

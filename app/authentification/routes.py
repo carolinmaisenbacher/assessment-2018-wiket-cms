@@ -28,7 +28,6 @@ def create_user():
 
 
     response = make_response(jsonify({"userId": new_user.id}), 201)
-    # response.headers["Set-Cookie"] = f"sessionId={sessionId}"
     sessionId = sessions.create(new_user.id)
     response.set_cookie("sessionId", value = sessionId)
 
@@ -80,6 +79,5 @@ class User ():
         for user in users:
             if user.email == email:
                 return user
-
 
 

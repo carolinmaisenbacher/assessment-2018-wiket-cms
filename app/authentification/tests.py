@@ -1,14 +1,12 @@
 import unittest
-from app import create_app
-from app.config import TestConfig
-from app.authentification.routes import login
-import requests
-from requests import cookies
 import time
 import json
-from app.authentification import routes
-from unittest.mock import MagicMock
+import requests
 
+from app import create_app
+from app.config import TestConfig
+
+from app.authentification import routes
 
 
 class SignUpCase(unittest.TestCase):
