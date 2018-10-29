@@ -21,7 +21,7 @@ def create_user():
 
     if not password:
         return make_response(jsonify({"error": "You have to provide a Password"}), 401)
-
+   
     if User.find(email):
         return make_response(jsonify({"error": "You already exist, please log in"}), 401)
 
@@ -71,12 +71,10 @@ class User ():
         self.email = email
         self.hashed_password = ""
         self.set_password(password)
-
     def generate_id(self):
         global id_counter
         id_counter += 1
         return id_counter
-
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode(), self.hashed_password)
