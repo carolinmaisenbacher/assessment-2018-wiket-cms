@@ -1,13 +1,14 @@
 <template>
   <div id="cmsSelectionLeft">
-    <div id="text">
-      <h4>
-        {{ data.title }}
-      </h4>
-      <p>
-        {{ data.subtext }}
-      </p>
-    </div>
+
+      <div id="text">
+        <h4>
+          {{ data.title }}
+        </h4>
+        <p>
+          {{ data.subtext }}
+        </p>
+      </div>
   </div>
 </template>
 <script>
@@ -16,6 +17,7 @@
     name: 'cmsSelectionLeft',
     data () {
       return{
+
       }
     },
     props: {
@@ -28,20 +30,32 @@
   };
 </script>
 <style>
+
   h4 {
-    margin: 5px 10px;
+    padding: 5px 10px;
+    margin: 0;
 
   }
   p {
-    margin: 0 10px 10px;
+    padding: 0 10px 10px;
+    margin: 0;
   }
-  #cmsSelectionLeft {
-    border: 2px none black;
+  button {
+    margin: 0;
+    padding: 0;
     border-radius: 5px;
-    width: 100%;
+    width: inherit;
+  }
+
+  #cmsSelectionLeft {
+    box-sizing: border-box;
+    background-color: inherit;
     text-align: left;
     float: left;
     margin: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+  }
+  #text {
+    width: 300px;
   }
 </style>
