@@ -7,11 +7,15 @@ connection = psycopg2.connect(dbname=Config.DATABASE_NAME, host="localhost", por
 
 datasets = []
 
-with open('dataset_user.csv', 'rb') as f:
-    cursor = connection.cursor()
-    cmd = 'COPY owner(id,first_name,last_name,email,password_hash) FROM STDIN WITH (FORMAT CSV, HEADER)'
-    cursor.copy_expert(cmd, f)
-    connection.commit()
+try:
+    with open('dataset_user.csv', 'rb') as f:
+        cursor = connection.cursor()
+        cmd = 'COPY owner(id,first_name,last_name,email,password_hash) FROM STDIN WITH (FORMAT CSV, HEADER)'
+        cursor.copy_expert(cmd, f)
+        connection.commit()
+except ValueError e:
+    print("ups")
+    connection.close()
 
 connection.close()
 
