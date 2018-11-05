@@ -10,6 +10,12 @@ def index():
         return jsonify("Hello")
     if request.method=='POST':
         restaurants = Restaurant.query.all()
-        return jsonify(restaurants)
+        return str(restaurants)
     
+    
+@blueprint.route("/<id>", methods=["POST"])
+def restaurant(id):
+    if request.method=='POST':
+        restaurant = Restaurant.query.get(id)
+        return str(restaurant)
     

@@ -47,7 +47,7 @@ class Restaurant(db.Model):
     street_number = db.Column(db.String(20))
     city_code = db.Column(db.String(20))
     city = db.Column(db.String(120))
-    text_active = db.Column(postgresql.ARRAY(db.ForeignKey('text.id')), nullable=True)
+    text_active = db.Column(postgresql.ARRAY(db.Integer()), nullable=True)
     # text_active = db.Column(postgresql.ARRAY(db.Integer), nullable=True)
 
     menu_paragraphs = db.relationship('MenuParagraph', backref='restaurant',lazy='joined')
