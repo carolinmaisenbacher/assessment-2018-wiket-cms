@@ -3,14 +3,13 @@
     <!-- hier würde ich gerne einen dynamischen pfad zu dem jeweiligen icon haben.
     Der pfad ist unter data.iconLink zu erreichen-->
     <img id="icon" src="../assets/icons/iconCmsIntro.svg" />
-    <div id="text">
+
       <h4>
         {{ data.title }}
       </h4>
       <p>
         {{ data.subtext }}
       </p>
-    </div>
   </div>
 </template>
 <script>
@@ -38,8 +37,6 @@
     text-align: center;
     float: left;
     margin: 10px;
-  }
-  #text {
   }
   #icon {
     top: 20px;

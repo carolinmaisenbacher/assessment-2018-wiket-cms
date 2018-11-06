@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div id="login">
     <!-- <h1>{{ msg }}</h1> -->
     <h1>login</h1>
 
@@ -64,18 +64,18 @@ export default {
 
 <style scoped>
 
-  h3 {
+  #login h3 {
     margin: 40px 0 0;
   }
-  ul {
+  #login ul {
     list-style-type: none;
     padding: 0;
   }
-  li {
+  #login li {
     display: inline-block;
     margin: 0 10px;
   }
-  a {
+  #login a {
     color: #42b983;
   }
 </style>

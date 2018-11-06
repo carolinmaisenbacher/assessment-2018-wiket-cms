@@ -75,13 +75,13 @@
   };
 </script>
 <style>
-  ul {
+  #selectionLeft ul {
     list-style-type: none;
   }
-  h3 {
+  #selectionLeft h3 {
     text-align: left;
   }
-  button {
+  #selectionLeft button {
     border: none;
     outline: none;
   }

@@ -49,18 +49,18 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  h3 {
+  .cms h3 {
     margin: 40px 0 0;
   }
-  ul {
+  .cms ul {
     list-style-type: none;
     padding: 0;
   }
-  li {
+  .cms li {
     display: inline-block;
     margin: 0 10px;
   }
-  a {
+  .cms a {
     color: #42b983;
   }
 </style>

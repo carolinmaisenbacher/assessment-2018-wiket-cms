@@ -1,5 +1,5 @@
 <template>
-  <div class="impressum">
+  <div id="impressum">
     <h1>now im on the impressum </h1>
   </div>
 </template>
@@ -14,18 +14,18 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  h3 {
+  #impressum h3 {
     margin: 40px 0 0;
   }
-  ul {
+  #impressum ul {
     list-style-type: none;
     padding: 0;
   }
-  li {
+  #impressum li {
     display: inline-block;
     margin: 0 10px;
   }
-  a {
+  #impressum a {
     color: #42b983;
   }
 </style>

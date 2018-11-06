@@ -31,16 +31,16 @@
 </script>
 <style>
 
-  h4 {
+  #cmsSelectionLeft h4 {
     padding: 5px 10px;
     margin: 0;
 
   }
-  p {
+  #cmsSelectionLeft p {
     padding: 0 10px 10px;
     margin: 0;
   }
-  button {
+  #cmsSelectionLeft button {
     margin: 0;
     padding: 0;
     border-radius: 5px;

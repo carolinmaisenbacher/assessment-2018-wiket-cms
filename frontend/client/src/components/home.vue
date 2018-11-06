@@ -74,7 +74,7 @@ export default {
 }
 </script>
 <style>
-  a {
+  #home a {
     color: inherit;
     text-decoration: none;
   }
