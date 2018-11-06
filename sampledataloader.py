@@ -13,8 +13,8 @@ def load_csv(table_name, file, connection):
 
         with open(file, 'rb') as f:
             cursor = connection.cursor()
-            comand = f'COPY {table_name}({column_names}) FROM STDIN WITH (FORMAT CSV, HEADER)'
-            cursor.copy_expert(comand, f)
+            command = f'COPY {table_name}({column_names}) FROM STDIN WITH (FORMAT CSV, HEADER)'
+            cursor.copy_expert(command, f)
             connection.commit()
             print(f"{file} loaded!")
     except psycopg2.IntegrityError:
