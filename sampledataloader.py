@@ -14,19 +14,18 @@ datasets = {"owner" : "sample_datasets/dataset_user.csv",
 }
 
 def load_csv(table_name, file, connection): 
-    # try:
-    with open(file, 'r') as f:
-        column_names = f.readline()
+    try:
+        with open(file, 'r') as f:
+            column_names = f.readline()
 
-    with open(file, 'rb') as f:
-        cursor = connection.cursor()
-        command = f'COPY {table_name}({column_names}) FROM STDIN WITH (FORMAT CSV, HEADER)'
-        cursor.copy_expert(command, f)
-        connection.commit()
-        print(f"{file} loaded!")
-# except psycopg2.IntegrityError:
-#     print(f"{file} already existed")
-    
+        with open(file, 'rb') as f:
+            cursor = connection.cursor()
+            command = f'COPY {table_name}({column_names}) FROM STDIN WITH (FORMAT CSV, HEADER)'
+            cursor.copy_expert(command, f)
+            connection.commit()
+            print(f"{file} loaded!")
+    except psycopg2.IntegrityError:
+        print(f"{file} already existed")
         connection.rollback()
 
 
