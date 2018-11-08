@@ -3,6 +3,9 @@ from app.main import blueprint
 from flask import request
 from app.main.models import Restaurant
 from flask import jsonify
+from app.main.models import myconverter
+
+import json
 
 @blueprint.route("/", methods=["POST", "GET"])
 def index():
@@ -17,5 +20,4 @@ def index():
 def restaurant(id):
     if request.method=='POST':
         restaurant = Restaurant.query.get(id)
-        return str(restaurant)
-    
+        return json.dumps(restaurant, default=myconverter)

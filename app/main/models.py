@@ -29,10 +29,12 @@ class AllergenType(enum.Enum):
     def __repr__(self):
         return self.name
 
+
 class Text(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False, default=str(id))
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    text = db.Column(postgresql.TEXT(), nullable=False)
+    created = db.Column(db.DateTime(), default=datetime.utcnow)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
 
     def __repr__(self):
@@ -52,11 +54,17 @@ class Restaurant(db.Model):
 
     menu_paragraphs = db.relationship('MenuParagraph', backref='restaurant',lazy='joined')
     dishes = db.relationship('Dish', backref='restaurant',lazy=True)
-    dish_variants = db.relationship('DishVariant', backref='restaurant',lazy=True)
     texts = db.relationship('Text', backref='restaurant',lazy=True)
 
     def __repr__(self):
         return '<Restaurant {}: {}>'.format(self.id, self.name) 
+
+def myconverter(o):
+
+    if isinstance(o, datetime):
+        return o.__str__()
+    else:
+        return o.__dict__
 
 
 class MenuParagraph(db.Model):
@@ -68,7 +76,6 @@ class MenuParagraph(db.Model):
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
 
     dishes = db.relationship('Dish', backref='menu_paragraph',lazy='joined')
-    dish_variants = db.relationship('DishVariant', backref='menu_paragraph',lazy=True)
 
     def __repr__(self):
         return '<Menu Paragraph {}: {}>'.format(self.id, self.title)
@@ -83,7 +90,7 @@ class Dish(db.Model):
     price = db.Column(db.Numeric(10,2), nullable=True)
     allergens = db.Column(postgresql.ARRAY(db.Enum(AllergenType)), nullable=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
-    menu_paragraph_id = db.Column(db.Integer, db.ForeignKey('menuparagraph.id'), nullable=True)
+    menuparagraph_id = db.Column(db.Integer, db.ForeignKey('menuparagraph.id'), nullable=True)
 
     dish_variants = db.relationship('DishVariant', backref='dish',lazy='joined')
 
@@ -95,8 +102,6 @@ class DishVariant(db.Model):
     measurement = db.Column(db.String(120), nullable=True)
     price = db.Column(db.Numeric(10,2), nullable=True)
     dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'), nullable=False)
-    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
-    menuparagraph_id = db.Column(db.Integer, db.ForeignKey('menuparagraph.id'), nullable=False)
 
     def __repr__(self):
         return '<Dish {}: {}>'.format(self.id, self.name)
