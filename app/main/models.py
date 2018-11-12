@@ -5,6 +5,7 @@ from sqlalchemy.dialects import postgresql
 # Column Type: postgresql.ARRAY(db.Integer)
 import enum
 from app.authentification.models import Owner
+from flask import url_for
 
 
 from app import db
@@ -42,7 +43,7 @@ class Text(db.Model):
 
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(180))
+    name = db.Column(db.String(180), nullable=False)
     email = db.Column(db.String(120))
     telephone = db.Column(db.String(40))
     street = db.Column(db.String(180))
@@ -58,6 +59,53 @@ class Restaurant(db.Model):
 
     def __repr__(self):
         return '<Restaurant {}: {}>'.format(self.id, self.name) 
+
+    def set_active_text(self, text):
+        self.text_active = text.id
+
+    def get_menu(self):
+        return MenuParagraph.query.join(Dish, Dish.menuparagraph_id == MenuParagraph.id).filter_by(restaurant_id = 1).add_columns(Dish.name, Dish.price, Dish.description).all()
+
+    def to_dict(self):
+        data = {
+            'id' : self.id,
+            'name' : self.name,
+            'email' : self.email,
+            'telephone' : self.telephone,
+            'street' : self.street,
+            'street_number' : self.street_number,
+            'city_code' : self.city_code,
+            'city' : self.city,
+            'text_active' : self.text_active,
+            'menu' : {
+
+            },
+            '_links' : 
+                {
+                    'self' : url_for('api.get_restaurant', id=self.id),
+                }
+            
+        }
+        return data
+    
+    @staticmethod
+    def collection_dict():
+        resources = Restaurant.query.all()
+        data = {
+            # 'items' : [item.to_dict() for item in resources],
+            '_meta' : {
+                'total_items' : resources.items(), 
+            }
+        }
+        return data
+        
+            
+
+    def from_dict(self, data):
+        for field in ["name", "email", "telephone", "street", "street_number", "city_code", "city"]:
+            if field in data:
+                setattr(self, field, data[field])
+
 
 def myconverter(o):
 
@@ -84,10 +132,8 @@ class Dish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable = False)
     description = db.Column(db.String(200), nullable = True)
-    vegetarian = db.Column(db.Boolean(), default=False)
-    vegan = db.Column(db.Boolean(), default= False)
-    measurement = db.Column(db.String(120), nullable=True)
-    price = db.Column(db.Numeric(10,2), nullable=True)
+    vegetarian = db.Column(db.Boolean(), nullable=False, default=False)
+    vegan = db.Column(db.Boolean(), nullable=False, default= False)
     allergens = db.Column(postgresql.ARRAY(db.Enum(AllergenType)), nullable=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
     menuparagraph_id = db.Column(db.Integer, db.ForeignKey('menuparagraph.id'), nullable=True)
