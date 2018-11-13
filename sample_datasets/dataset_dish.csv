@@ -1,5 +1,5 @@
 id,restaurant_id,menuparagraph_id,name,description,vegetarian,vegan,allergens
-1,1,1,skordalia,Creme aus Kartoffeln und frischem Knoblauch,TRUE,FALSE,{"GLUTENHALTIGEGETREIDE"}
+1,1,1,skordalia,Creme aus Kartoffeln und frischem Knoblauch,TRUE,FALSE,
 2,1,1,tsatsiki,"Joghurt mit Gurke, Knoblauch und Gewürzen",TRUE,FALSE,
 3,1,1,elies,Portion Oliven und Peperoni,TRUE,TRUE,
 4,1,1,padsaria,Rote Beete mit Knoblauch und Tsatsiki,TRUE,FALSE,

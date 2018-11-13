@@ -63,23 +63,39 @@ class Restaurant(db.Model):
     def set_active_text(self, text):
         self.text_active = text.id
 
-    def get_menu(self):
-        return MenuParagraph.query.join(Dish, Dish.menuparagraph_id == MenuParagraph.id).filter_by(restaurant_id = 1).add_columns(Dish.name, Dish.price, Dish.description).all()
+    def _get_menu(self):
+        return MenuParagraph.query.filter_by(restaurant_id = self.id).join(Dish).join(DishVariant, Dish.id == DishVariant.dish_id).all()
+        
+        # MenuParagraph.query.join(Dish, Dish.menuparagraph_id == MenuParagraph.id).filter_by(restaurant_id = 1).add_columns(Dish.name, Dish.price, Dish.description).all()
+    def _get_menu_dict(self):
+        paragraphs = self._get_menu()
+        data = {
+        }
+        for paragraph in paragraphs:
+            if paragraph.title not in data:
+                data[paragraph.title] = []
+            for dish in paragraph.dishes:
+                data[paragraph.title].append(dish.to_dict())
+        return data
+
+
 
     def to_dict(self):
         data = {
             'id' : self.id,
             'name' : self.name,
-            'email' : self.email,
-            'telephone' : self.telephone,
-            'street' : self.street,
-            'street_number' : self.street_number,
-            'city_code' : self.city_code,
-            'city' : self.city,
-            'text_active' : self.text_active,
-            'menu' : {
-
+            'contact' : {
+                'email' : self.email,
+                'telephone' : self.telephone,
+                'street' : self.street,
+                'street_number' : self.street_number,
+                'city_code' : self.city_code,
+                'city' : self.city,
             },
+            'content' : {
+                'text_active' : self.text_active,
+            },
+            'menu' : self._get_menu_dict(),
             '_links' : 
                 {
                     'self' : url_for('api.get_restaurant', id=self.id),
@@ -138,7 +154,22 @@ class Dish(db.Model):
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
     menuparagraph_id = db.Column(db.Integer, db.ForeignKey('menuparagraph.id'), nullable=True)
 
-    dish_variants = db.relationship('DishVariant', backref='dish',lazy='joined')
+    variants = db.relationship('DishVariant', backref='dish',lazy='joined')
+
+    def to_dict(self):
+        data = {
+            "id" : self.id,
+            "name" : self.name,
+            "description" : self.description,
+            "variants" : []
+        }
+        for variant in self.variants:
+            data["variants"].append(variant.to_dict())
+        if self.vegan:
+            data["vegan"] = True
+        if self.vegetarian:
+            data["vegetarian"] = True   
+        return data
 
     def __repr__(self):
         return '<Dish {}: {}>'.format(self.id, self.name)
@@ -149,8 +180,16 @@ class DishVariant(db.Model):
     price = db.Column(db.Numeric(10,2), nullable=True)
     dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'), nullable=False)
 
+    def to_dict(self):
+        data = {
+            "measurement" : self.measurement,
+            "price" : str(self.price),
+            "id" : self.id
+        }
+        return data
+
     def __repr__(self):
-        return '<Dish {}: {}>'.format(self.id, self.name)
+        return '<Dish {}: DishVariant {}>'.format(self.dish_id, self.id)
 
 
 
