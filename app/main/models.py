@@ -58,12 +58,21 @@ class TextActive(db.Model):
     text_id = db.Column(db.Integer, db.ForeignKey('text.id'), primary_key=True, nullable=False)
 
     def to_dict(self):
-        data = {}
-        data[self.position] = self.text.to_dict()
-        return data
+        return self.text.to_dict()
 
     def __repr__(self):
         return '<Active Text {}: {}>'.format(self.id, self.text.title)
+
+    def __lt__(self, other):
+        if self.position < other.position:
+            return True
+        return False
+
+    def __gt__(self, other):
+        if self.position > other.position:
+            return True
+        return False
+
 
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,20 +96,15 @@ class Restaurant(db.Model):
     def set_active_text(self, text):
         self.text_active = text.id
 
-    def _get_menu(self):
-        return MenuParagraph.query.filter_by(restaurant_id = self.id).join(Dish).join(DishVariant, Dish.id == DishVariant.dish_id).all()
+    def _get_menu_paragraphs(self):
+        return MenuParagraph.query.filter_by(restaurant_id = self.id).order_by(MenuParagraph.position).join(Dish).join(DishVariant, Dish.id == DishVariant.dish_id).all()
         
         # MenuParagraph.query.join(Dish, Dish.menuparagraph_id == MenuParagraph.id).filter_by(restaurant_id = 1).add_columns(Dish.name, Dish.price, Dish.description).all()
     def _get_menu_dict(self):
-        paragraphs = self._get_menu()
-        data = {
-        }
+        paragraphs = self._get_menu_paragraphs()
+        data = {}
         for paragraph in paragraphs:
-            title = html.unescape(paragraph.title)
-            if title not in data:
-                data[title] = []
-            for dish in paragraph.dishes:
-                data[title].append(dish.to_dict())
+            data.update(paragraph.to_dict())
         return data
 
     def to_dict(self):
@@ -116,17 +120,17 @@ class Restaurant(db.Model):
                 'city' : html.unescape(self.city),
             },
             'content' : {
-                'texts' : {},
             },
             'menu' : self._get_menu_dict(),
             '_links' : 
                 {
                     'self' : url_for('api.get_restaurant', id=self.id),
-                }
+                }   
             
         }
-        for text in self.texts_active:
-            data["content"]["texts"].update(text.to_dict()) 
+        self.texts_active.sort()
+        for index, text in enumerate(self.texts_active):
+            data["content"][index] = text.to_dict() 
         return data
     
     @staticmethod
@@ -154,13 +158,23 @@ class MenuParagraph(db.Model):
     title = db.Column(db.String(120), nullable=False)
     description = db.Column(db.String(200), nullable=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
+    position = db.Column(db.Integer, nullable=False)
 
     dishes = db.relationship('Dish', backref='menu_paragraph',lazy='joined')
 
     def to_dict(self):
-        data = {
-            'description' : self.description
+        data = {    
+            "id" : self.id,       
+            "title" : self.title,
+            "dishes" : {}
         }
+        if self.description:
+            data[self.position] = {
+                "description" : self.description         
+                }
+        for dish in self.dishes:
+            
+            data["dishes"].update(dish.to_dict())
         return data
 
     def __repr__(self):
@@ -175,6 +189,7 @@ class Dish(db.Model):
     allergens = db.Column(postgresql.ARRAY(db.Enum(AllergenType)), nullable=True)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
     menuparagraph_id = db.Column(db.Integer, db.ForeignKey('menuparagraph.id'), nullable=True)
+    position = db.Column(db.Integer, nullable=False)
 
     variants = db.relationship('DishVariant', backref='dish',lazy='joined')
 
@@ -193,7 +208,7 @@ class Dish(db.Model):
             data["vegan"] = True
         if self.vegetarian:
             data["vegetarian"] = True   
-        return data
+        return {self.position : data}
 
     def __repr__(self):
         return '<Dish {}: {}>'.format(self.id, self.name)
