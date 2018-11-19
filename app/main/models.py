@@ -6,7 +6,7 @@ from sqlalchemy.dialects import postgresql
 import enum
 from app.authentification.models import Owner
 from flask import url_for
-
+import html
 
 from app import db
 from datetime import datetime
@@ -38,8 +38,32 @@ class Text(db.Model):
     created = db.Column(db.DateTime(), default=datetime.utcnow)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
 
+    texts_active = db.relationship('TextActive', backref=db.backref('text', lazy='joined'),lazy=True)
+
+    def to_dict(self):
+        data = {
+            'id' : self.id,
+            'title' : html.unescape(self.title),
+            'text' : html.unescape(self.text),
+            'created' : self.created
+        }
+        return data
+
     def __repr__(self):
         return '<Text {}: {}>'.format(self.id, self.title)
+
+class TextActive(db.Model):
+    position = db.Column(db.Integer, nullable=False)
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), primary_key=True, nullable=False)
+    text_id = db.Column(db.Integer, db.ForeignKey('text.id'), primary_key=True, nullable=False)
+
+    def to_dict(self):
+        data = {}
+        data[self.position] = self.text.to_dict()
+        return data
+
+    def __repr__(self):
+        return '<Active Text {}: {}>'.format(self.id, self.text.title)
 
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,12 +74,12 @@ class Restaurant(db.Model):
     street_number = db.Column(db.String(20))
     city_code = db.Column(db.String(20))
     city = db.Column(db.String(120))
-    text_active = db.Column(postgresql.ARRAY(db.Integer()), nullable=True)
-    # text_active = db.Column(postgresql.ARRAY(db.Integer), nullable=True)
+    # texts_active = db.relationship('Text', secondary=texts_active, lazy='joined', backref=db.backref('pages', lazy=True))
 
     menu_paragraphs = db.relationship('MenuParagraph', backref='restaurant',lazy='joined')
     dishes = db.relationship('Dish', backref='restaurant',lazy=True)
     texts = db.relationship('Text', backref='restaurant',lazy=True)
+    texts_active = db.relationship('TextActive', backref=db.backref('restaurant', lazy=True),lazy='joined')
 
     def __repr__(self):
         return '<Restaurant {}: {}>'.format(self.id, self.name) 
@@ -72,28 +96,27 @@ class Restaurant(db.Model):
         data = {
         }
         for paragraph in paragraphs:
-            if paragraph.title not in data:
-                data[paragraph.title] = []
+            title = html.unescape(paragraph.title)
+            if title not in data:
+                data[title] = []
             for dish in paragraph.dishes:
-                data[paragraph.title].append(dish.to_dict())
+                data[title].append(dish.to_dict())
         return data
-
-
 
     def to_dict(self):
         data = {
             'id' : self.id,
-            'name' : self.name,
+            'name' : html.unescape(self.name),
             'contact' : {
-                'email' : self.email,
-                'telephone' : self.telephone,
-                'street' : self.street,
-                'street_number' : self.street_number,
-                'city_code' : self.city_code,
-                'city' : self.city,
+                'email' : html.unescape(self.email),
+                'telephone' : html.unescape(str(self.telephone)),
+                'street' : html.unescape(self.street),
+                'street_number' : html.unescape(self.street_number),
+                'city_code' : html.unescape(self.city_code),
+                'city' : html.unescape(self.city),
             },
             'content' : {
-                'text_active' : self.text_active,
+                'texts' : {},
             },
             'menu' : self._get_menu_dict(),
             '_links' : 
@@ -102,15 +125,17 @@ class Restaurant(db.Model):
                 }
             
         }
+        for text in self.texts_active:
+            data["content"]["texts"].update(text.to_dict()) 
         return data
     
     @staticmethod
     def collection_dict():
-        resources = Restaurant.query.all()
+        restaurants = Restaurant.query.all()
         data = {
-            # 'items' : [item.to_dict() for item in resources],
+            'restaurants' : [restaurant.to_dict() for restaurant in restaurants],
             '_meta' : {
-                'total_items' : resources.items(), 
+                'total_items' : len(restaurants), 
             }
         }
         return data
@@ -122,15 +147,6 @@ class Restaurant(db.Model):
             if field in data:
                 setattr(self, field, data[field])
 
-
-def myconverter(o):
-
-    if isinstance(o, datetime):
-        return o.__str__()
-    else:
-        return o.__dict__
-
-
 class MenuParagraph(db.Model):
     __tablename__ = 'menuparagraph'
 
@@ -140,6 +156,12 @@ class MenuParagraph(db.Model):
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
 
     dishes = db.relationship('Dish', backref='menu_paragraph',lazy='joined')
+
+    def to_dict(self):
+        data = {
+            'description' : self.description
+        }
+        return data
 
     def __repr__(self):
         return '<Menu Paragraph {}: {}>'.format(self.id, self.title)
@@ -159,10 +181,12 @@ class Dish(db.Model):
     def to_dict(self):
         data = {
             "id" : self.id,
-            "name" : self.name,
-            "description" : self.description,
+            "name" : html.unescape(self.name),
             "variants" : []
         }
+        if self.description:
+            data["description"] = html.unescape(self.description)
+
         for variant in self.variants:
             data["variants"].append(variant.to_dict())
         if self.vegan:
@@ -182,7 +206,7 @@ class DishVariant(db.Model):
 
     def to_dict(self):
         data = {
-            "measurement" : self.measurement,
+            "measurement" : html.unescape(str(self.measurement)),
             "price" : str(self.price),
             "id" : self.id
         }
