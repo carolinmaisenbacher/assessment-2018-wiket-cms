@@ -77,12 +77,12 @@ class TextActive(db.Model):
 class Restaurant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(180), nullable=False)
-    email = db.Column(db.String(120))
-    telephone = db.Column(db.String(40))
-    street = db.Column(db.String(180))
-    street_number = db.Column(db.String(20))
-    city_code = db.Column(db.String(20))
-    city = db.Column(db.String(120))
+    email = db.Column(db.String(120), nullable=True)
+    telephone = db.Column(db.String(40), nullable=True)
+    street = db.Column(db.String(180), nullable=False)
+    street_number = db.Column(db.String(20), nullable=True)
+    city_code = db.Column(db.String(20), nullable=False)
+    city = db.Column(db.String(120), nullable=False)
     # texts_active = db.relationship('Text', secondary=texts_active, lazy='joined', backref=db.backref('pages', lazy=True))
 
     menu_paragraphs = db.relationship('MenuParagraph', backref='restaurant',lazy='joined')
@@ -93,46 +93,47 @@ class Restaurant(db.Model):
     def __repr__(self):
         return '<Restaurant {}: {}>'.format(self.id, self.name) 
 
-    def set_active_text(self, text):
-        self.text_active = text.id
+    def _menu_to_sorted_array(self):
+        self.menu_paragraphs.sort()
+        return [paragraph.to_dict() for paragraph in self.menu_paragraphs]
 
-    def _get_menu_paragraphs(self):
-        return MenuParagraph.query.filter_by(restaurant_id = self.id).order_by(MenuParagraph.position).join(Dish).join(DishVariant, Dish.id == DishVariant.dish_id).all()
-        
-        # MenuParagraph.query.join(Dish, Dish.menuparagraph_id == MenuParagraph.id).filter_by(restaurant_id = 1).add_columns(Dish.name, Dish.price, Dish.description).all()
-    def _get_menu_dict(self):
-        paragraphs = self._get_menu_paragraphs()
-        data = {}
-        for paragraph in paragraphs:
-            data.update(paragraph.to_dict())
-        return data
+    def _active_texts_to_sorted_array(self):
+        self.texts_active.sort()
+        return [text.to_dict() for text in self.texts_active]
 
     def to_dict(self):
+        
         data = {
             'id' : self.id,
             'name' : html.unescape(self.name),
-            'contact' : {
-                'email' : html.unescape(self.email),
-                'telephone' : html.unescape(str(self.telephone)),
-                'street' : html.unescape(self.street),
-                'street_number' : html.unescape(self.street_number),
-                'city_code' : html.unescape(self.city_code),
-                'city' : html.unescape(self.city),
-            },
+            'contact' : self._contact_to_dict(),
             'content' : {
+                'texts' : self._active_texts_to_sorted_array()
             },
-            'menu' : self._get_menu_dict(),
+            'menu' : self._menu_to_sorted_array(),
             '_links' : 
                 {
                     'self' : url_for('api.get_restaurant', id=self.id),
                 }   
             
         }
-        self.texts_active.sort()
-        for index, text in enumerate(self.texts_active):
-            data["content"][index] = text.to_dict() 
         return data
-    
+
+    def _contact_to_dict(self):
+        data = {
+            'street' : html.unescape(self.street),
+            'city_code' : html.unescape(self.city_code),
+            'city' : html.unescape(self.city),
+        }
+        if self.email:
+            data['email'] = html.unescape(self.email)
+        if self.telephone:
+            data['telephone'] = html.unescape(self.telephone)
+        if self.street_number:
+            data['street_number'] = html.unescape(self.street_number)
+        return data
+
+
     @staticmethod
     def collection_dict():
         restaurants = Restaurant.query.all()
@@ -143,8 +144,6 @@ class Restaurant(db.Model):
             }
         }
         return data
-        
-            
 
     def from_dict(self, data):
         for field in ["name", "email", "telephone", "street", "street_number", "city_code", "city"]:
@@ -165,20 +164,25 @@ class MenuParagraph(db.Model):
     def to_dict(self):
         data = {    
             "id" : self.id,       
-            "title" : self.title,
-            "dishes" : {}
+            "title" : self.title
         }
         if self.description:
-            data[self.position] = {
-                "description" : self.description         
-                }
-        for dish in self.dishes:
-            
-            data["dishes"].update(dish.to_dict())
+            data["description"] = self.description         
+        data["dishes"] = [dish.to_dict() for dish in self.dishes]
         return data
 
     def __repr__(self):
         return '<Menu Paragraph {}: {}>'.format(self.id, self.title)
+
+    def __lt__(self, other):
+        if self.position < other.position:
+            return True
+        return False
+
+    def __gt__(self, other):
+        if self.position > other.position:
+            return True
+        return False
 
 class Dish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -208,7 +212,7 @@ class Dish(db.Model):
             data["vegan"] = True
         if self.vegetarian:
             data["vegetarian"] = True   
-        return {self.position : data}
+        return data
 
     def __repr__(self):
         return '<Dish {}: {}>'.format(self.id, self.name)
@@ -218,6 +222,7 @@ class DishVariant(db.Model):
     measurement = db.Column(db.String(120), nullable=True)
     price = db.Column(db.Numeric(10,2), nullable=True)
     dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'), nullable=False)
+    position = db.Column(db.Integer, default=1)
 
     def to_dict(self):
         data = {
