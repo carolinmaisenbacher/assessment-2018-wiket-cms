@@ -18,6 +18,8 @@ def create_app(config = Config):
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
     from app.main import blueprint as main_blueprint
     app.register_blueprint(main_blueprint)
+    from app.api import blueprint as api_blueprint
+    app.register_blueprint(api_blueprint, url_prefix='/api')
 
     # everything in here will be skipped when testing
     if not app.debug and not app.testing:
