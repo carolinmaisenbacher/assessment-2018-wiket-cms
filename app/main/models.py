@@ -167,7 +167,9 @@ class MenuParagraph(db.Model):
             "title" : self.title
         }
         if self.description:
-            data["description"] = self.description         
+            data["description"] = self.description    
+
+        self.dishes.sort()     
         data["dishes"] = [dish.to_dict() for dish in self.dishes]
         return data
 
@@ -200,22 +202,32 @@ class Dish(db.Model):
     def to_dict(self):
         data = {
             "id" : self.id,
-            "name" : html.unescape(self.name),
-            "variants" : []
+            "name" : html.unescape(self.name)
         }
         if self.description:
             data["description"] = html.unescape(self.description)
 
-        for variant in self.variants:
-            data["variants"].append(variant.to_dict())
         if self.vegan:
             data["vegan"] = True
         if self.vegetarian:
-            data["vegetarian"] = True   
+            data["vegetarian"] = True  
+
+        self.variants.sort()
+        data["variants"] = [variant.to_dict() for variant in self.variants]
         return data
 
     def __repr__(self):
         return '<Dish {}: {}>'.format(self.id, self.name)
+
+    def __lt__(self, other):
+        if self.position < other.position:
+            return True
+        return False
+
+    def __gt__(self, other):
+        if self.position > other.position:
+            return True
+        return False
 
 class DishVariant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -228,12 +240,22 @@ class DishVariant(db.Model):
         data = {
             "measurement" : html.unescape(str(self.measurement)),
             "price" : str(self.price),
-            "id" : self.id
+            "id" : self .id
         }
         return data
 
     def __repr__(self):
         return '<Dish {}: DishVariant {}>'.format(self.dish_id, self.id)
+
+    def __lt__(self, other):
+        if self.position < other.position:
+            return True
+        return False
+
+    def __gt__(self, other):
+        if self.position > other.position:
+            return True
+        return False
 
 
 
