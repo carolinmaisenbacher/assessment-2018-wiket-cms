@@ -40,8 +40,13 @@ p {
 
     margin: 0;
     padding: 0;
-    text-decoration: underline;
     text-align: right;
+    background-color: yellow;
+    
+}
+
+.dishname {
+    text-decoration: underline;
 }
 
 
@@ -69,6 +74,11 @@ p {
     
     
 }
+
+.dishbox {
+    padding: 0 0 2vh;
+}
+
 .textbox{
     width: auto;
     max-width:500px;

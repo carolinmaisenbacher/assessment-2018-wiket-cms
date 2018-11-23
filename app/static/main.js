@@ -68,7 +68,15 @@ function buildWebsiteContent(data) {
 }
     // menu
     if (data.menu){
+        let space = document.createElement("div");
+        space.style.gridRow = startRow + "/" + endRow;
+        space.style.height= 10 + "vh";
+        myContainer.append(space);
+        startRow++;
+        endRow++;
+        
         let menu_heading = document.createElement("div");
+        
         menu_heading.style.gridRow = startRow + "/" + endRow;
         startRow++;
         endRow++;
@@ -78,26 +86,58 @@ function buildWebsiteContent(data) {
         menu_heading.append(title)
         myContainer.append(menu_heading)
 
+
+
         console.log(data)
 
         
         for(let i = 0, len = data.menu.length; i < len; i++){
             let paragraph_box = document.createElement("div");
             paragraph_box.className = "paragraphBox";
-            startRow++;
-            endRow++;
+            paragraph_box.style.gridRow = startRow + "/" + endRow;
+            paragraph_box.style.gridColumn = 2 + "/" + 3;
+       
             menu_paragraph = data.menu[i]
             el = document.createElement("p");
             el.innerHTML = menu_paragraph.title;
             el.className = "subsubheading";
+            
+            el.style.gridRow = startRow + "/" + endRow;
             el.style.gridColumn = 1+ "/" + 2;
             myContainer.append(el);
             for (let j = 0, len = menu_paragraph.dishes.length; j < len; j++) {
-                ell = document.createElement("p");
-                ell.innerHTML = menu_paragraph.dishes[j].name;
-                ell.style.gridColumn = 2+ "/" + 3;
-                paragraph_box.append(ell)
-            }
+                dish_box = document.createElement("div");
+                dish_box.className = "dishbox";
+                dish_box.style.gridColumn = 2+ "/" + 3;
+
+                dishName = document.createElement("p");
+                dishName.className = "dishname";
+                dishName.innerHTML = menu_paragraph.dishes[j].name;
+                dish_box.append(dishName);
+
+                dishDescr = document.createElement("p");
+                dishDescr.innerHTML = menu_paragraph.dishes[j].description;
+                dish_box.append(dishDescr);
+
+                for (let k = 0, len = menu_paragraph.dishes[j].variants.length; k < len; k++) {
+                    if(menu_paragraph.dishes[j].variants[k].measurement != "None") {
+                        // console.log(menu_paragraph.dishes[j].variants[k])
+                        dishVariantMeasurement = document.createElement("p");
+                        dishVariantMeasurement.innerHTML = menu_paragraph.dishes[j].variants[k].measurement + " | " + menu_paragraph.dishes[j].variants[k].price;
+                        dish_box.append(dishVariantMeasurement);
+                        } else {
+                            dishVariantPrice = document.createElement("p");
+                            dishVariantPrice.innerHTML = menu_paragraph.dishes[j].variants[k].price;
+                            dish_box.append(dishVariantPrice);  
+                        }
+                     
+                    }   
+                
+                paragraph_box.append(dish_box)
+                }
+            
+            startRow++;
+            endRow++;
             myContainer.append(paragraph_box);
             
             
