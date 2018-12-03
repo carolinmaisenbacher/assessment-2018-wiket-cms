@@ -25,8 +25,6 @@ fetch(url_local + "api/restaurants/3")
 function buildWebsiteContent(data) {
     let startRow = 2
     let endRow = 3
-    let startColumn = 2;
-    let endColumn = 3;
 
     // title
     let myContainer = document.getElementById('canvas');

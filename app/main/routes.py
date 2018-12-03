@@ -6,15 +6,16 @@ from flask import jsonify,render_template
 
 import json
 
-@blueprint.route("/", methods=["POST", "GET"])
+@blueprint.route("/", methods=["GET"])
 def index():
     if request.method == 'GET':
         return render_template('index.html')
-    if request.method=='POST':
-        restaurants = Restaurant.query.all()
-        return str(restaurants)
     
-    
+@blueprint.route("/admin", methods=["GET"])
+def admin():
+    if request.method == 'GET':
+        return render_template('cms.html') 
+   
 @blueprint.route("/<id>", methods=["POST"])
 def restaurant(id):
     if request.method=='POST':
