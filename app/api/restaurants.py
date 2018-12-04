@@ -9,11 +9,3 @@ def get_restaurant(id):
 @bp.route('/restaurants', methods=['GET'])
 def get_restaurants():
     return jsonify(Restaurant.collection_dict())
-
-@bp.route('/restaurants/<int:id>/menu', methods=['GET'])
-def get_menu(id):
-    pass
-
-@bp.route('/restaurants/<int:id>/menu', methods=['PUT'])
-def update_menu(id):
-    pass

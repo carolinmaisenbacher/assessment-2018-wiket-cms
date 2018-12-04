@@ -1,6 +1,8 @@
 from app.authentification import blueprint
 from flask import request, abort, jsonify, make_response
 from app.authentification.sessions import Sessions
+
+# uses the blowfish cipher salt, (prevents rainbow tables)
 import bcrypt
 
 users = []   
