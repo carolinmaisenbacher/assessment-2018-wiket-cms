@@ -1,5 +1,11 @@
 from os import urandom
 
+def login():
+    pass
+
+def logout():
+    pass
+
 class Sessions():
     def __init__(self):
         self.sessions = {}
@@ -11,3 +17,4 @@ class Sessions():
 
     def check(self, sessionId):
         return self.sessions.get(sessionId)
+

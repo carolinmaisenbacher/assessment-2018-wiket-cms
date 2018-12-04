@@ -15,6 +15,14 @@ def index():
 def admin():
     if request.method == 'GET':
         return render_template('cms.html') 
+
+@blueprint.route("/signup", methods=["GET"])
+def signup():
+    return render_template('signup.html')
+
+@blueprint.route("/login", methods=["GET"])
+def login():
+    return render_template('login.html') 
    
 @blueprint.route("/<id>", methods=["POST"])
 def restaurant(id):

@@ -1,9 +1,12 @@
 from app.authentification import blueprint
 from flask import request, abort, jsonify, make_response
 from app.authentification.sessions import Sessions
+import html
 
 # uses the blowfish cipher salt, (prevents rainbow tables)
 import bcrypt
+from app.authentification.models import Owner
+from app import db
 
 users = []   
 id_counter = 0
@@ -11,7 +14,7 @@ sessions = Sessions()
 
 @blueprint.route("/signup", methods=["POST"])
 def create_user():
-    if not request.json or not 'password' in request.json or not 'email' in request.json:
+    if not request.json:
         abort(400)
     email = request.json['email']
     if not email:
@@ -21,21 +24,22 @@ def create_user():
 
     if not password:
         return make_response(jsonify({"error": "You have to provide a Password"}), 401)
+
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+
+    if not first_name or not last_name:
+        return make_response(jsonify({"error": "You have to provide a First and a Lastname"}), 401)
    
-    if User.find(email):
+    if Owner.query.filter(Owner.email==email).first():
         return make_response(jsonify({"error": "You already exist, please log in"}), 401)
 
-    new_user = User(email, password)
-    users.append(new_user)
+    new_owner = Owner.create_owner(first_name=first_name, last_name=last_name, email=email, password=password)
 
-
-    response = make_response(jsonify({"userId": new_user.id}), 201)
-    sessionId = sessions.create(new_user.id)
+    response = make_response(jsonify({"userId": new_owner.id}), 201)
+    sessionId = sessions.create(new_owner.id)
     response.set_cookie("sessionId", value = sessionId)
-
     return response
-
-
 
 @blueprint.route("/login", methods=["POST"])
 def login():
@@ -44,17 +48,17 @@ def login():
     password = request.json['password']
     email = request.json['email'] 
 
-    user = User.find(email)
-    if not user:
-        return make_response(jsonify({"error": "Username or passowrd incorrect!"}), 401)
+    owner = Owner.query.filter(Owner.email==email).first()
+    if not owner:
+        return make_response(jsonify({"error": "Username or password incorrect!"}), 401)
 
-    if not user.check_password(password):  
+    if not owner.check_password(password):  
         return make_response(jsonify({"error": "Username or password incorrect"}), 401)
 
-    response = make_response(jsonify({"userId" : user.id}), 200) 
-    sessionId = sessions.create(user.id)
+    response = make_response(jsonify({"userId" : owner.id}), 200) 
+    sessionId = sessions.create(owner.id)
     response.set_cookie("sessionId", value = sessionId)
-    return response
+    return make_response(jsonify({"id" : owner.id}))
 
 
 class User ():
