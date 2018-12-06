@@ -1,16 +1,12 @@
 from app.authentification import blueprint
-from flask import request, abort, jsonify, make_response
-from app.authentification.sessions import Sessions
+from flask import request, abort, jsonify, make_response, redirect
 import html
 
 # uses the blowfish cipher salt, (prevents rainbow tables)
 import bcrypt
+from app.authentification.sessions import login as login_user, logout as logout_user
 from app.authentification.models import Owner
 from app import db
-
-users = []   
-id_counter = 0
-sessions = Sessions()
 
 @blueprint.route("/signup", methods=["POST"])
 def create_user():
@@ -35,11 +31,9 @@ def create_user():
         return make_response(jsonify({"error": "You already exist, please log in"}), 401)
 
     new_owner = Owner.create_owner(first_name=first_name, last_name=last_name, email=email, password=password)
-
-    response = make_response(jsonify({"userId": new_owner.id}), 201)
-    sessionId = sessions.create(new_owner.id)
-    response.set_cookie("sessionId", value = sessionId)
-    return response
+ 
+    response = make_response({"userid" : new_owner.id}, 201)
+    return login_user(new_owner, response)
 
 @blueprint.route("/login", methods=["POST"])
 def login():
@@ -55,35 +49,7 @@ def login():
     if not owner.check_password(password):  
         return make_response(jsonify({"error": "Username or password incorrect"}), 401)
 
-    response = make_response(jsonify({"userId" : owner.id}), 200) 
-    sessionId = sessions.create(owner.id)
-    response.set_cookie("sessionId", value = sessionId)
-    return make_response(jsonify({"id" : owner.id}))
-
-
-class User ():
-    def __init__(self, email, password):
-        self.id = self.generate_id()
-        self.email = email
-        self.hashed_password = ""
-        self.set_password(password)
-    
-    def generate_id(self):
-        global id_counter
-        id_counter += 1
-        return id_counter
-        
-
-    def check_password(self, password):
-        return bcrypt.checkpw(password.encode(), self.hashed_password)
-
-    def set_password(self, password):
-        self.hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-
-    @classmethod
-    def find(_cls, email):
-        for user in users:
-            if user.email == email:
-                return user
-
+    response = redirect("/")
+    login_user(owner, response)
+    return response
 
