@@ -32,7 +32,7 @@ def create_user():
 
     new_owner = Owner.create_owner(first_name=first_name, last_name=last_name, email=email, password=password)
  
-    response = make_response({"userid" : new_owner.id}, 201)
+    response = make_response("user created", 201)
     return login_user(new_owner, response)
 
 @blueprint.route("/login", methods=["POST"])
@@ -49,7 +49,7 @@ def login():
     if not owner.check_password(password):  
         return make_response(jsonify({"error": "Username or password incorrect"}), 401)
 
-    response = redirect("/")
+    response = redirect("/admin")
     login_user(owner, response)
     return response
 

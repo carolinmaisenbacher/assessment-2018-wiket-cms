@@ -28,7 +28,7 @@ def is_valid_sessionId(sessionId):
 # should be implemented as a singleton
 class Sessions():
     def __init__(self):
-        self.sessions = {123243242 : "uefsjk"}
+        self.sessions = {}
 
     # I know it is totally not secure to mess with the random number generator, but I just didn't manage to store the byte string correctly in the cookie
     # next time I would use a solution that is out there already
@@ -51,6 +51,8 @@ class Sessions():
         if sessionId in self.sessions:
             self.sessions.pop(sessionId)
     
+    def get_user_id(self, sessionId):
+        return self.sessions[int(sessionId)].value
 
 
 

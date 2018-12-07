@@ -2,7 +2,7 @@
 from app.main import blueprint
 from flask import request
 from app.main.models import Restaurant
-from flask import jsonify,render_template, redirect, make_response
+from flask import jsonify,render_template, redirect, make_response, abort
 from app.authentification.sessions import is_logged_in, login as login_user, logout as logout_user
 from app.authentification.models import Owner
 
@@ -48,6 +48,10 @@ def login():
     email = request.form.get("email")
     print(email)
     password = request.form.get("password")
+
+    if not password or not email:
+        abort(400)
+
     owner = Owner.query.filter(Owner.email==email).first()
     if not owner:
         return make_response(jsonify({"error": "Username or password incorrect!"}), 401)
