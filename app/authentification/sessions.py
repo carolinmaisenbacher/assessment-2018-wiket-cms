@@ -11,18 +11,21 @@ def logout(sessionId):
     sessions.remove(int(sessionId))
 
 def is_logged_in(request):
-    sessionId = int(request.cookies.get("sessionId"))
+    try:
+        sessionId = request.cookies.get("sessionId")
+    except ValueError as e:
+        return False
     if sessionId:
-        print("all sessions in sessions: ")
-        for session in sessions.sessions.keys():
-            print(session)
         return is_valid_sessionId(sessionId)
     else:
-        return redirect("/login") 
+        return False 
 
 def is_valid_sessionId(sessionId):
-    if sessions.check(int(sessionId)):
-        return True
+    try:
+        if sessions.check(int(sessionId)):
+            return True
+    except ValueError as e:
+        return False
     return False
 
 # should be implemented as a singleton
