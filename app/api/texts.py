@@ -1,9 +1,12 @@
 from app.api import blueprint as bp
 from flask import jsonify, request, abort, make_response
 from app.main.models import Text, TextActive
+from app.authentification.sessions import is_logged_in
 
 @bp.route('/texts/', methods=['PUT'])
 def update_texts():
+    if not is_logged_in(request):
+        return make_response("You are authorized to change this text", 401)
     if not request.json:
         abort(400)
     id = request.json.get("id")

@@ -85,6 +85,7 @@ class Restaurant(db.Model):
     city = db.Column(db.String(120), nullable=False)
     # texts_active = db.relationship('Text', secondary=texts_active, lazy='joined', backref=db.backref('pages', lazy=True))
 
+    owners = db.relationship('Text', backref='restaurant',lazy=True)
     menu_paragraphs = db.relationship('MenuParagraph', backref='restaurant',lazy='joined')
     dishes = db.relationship('Dish', backref='restaurant',lazy=True)
     texts = db.relationship('Text', backref='restaurant',lazy=True)
