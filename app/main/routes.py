@@ -46,7 +46,6 @@ def login():
         return render_template('login.html') 
     
     email = request.form.get("email")
-    print(email)
     password = request.form.get("password")
 
     if not password or not email:

@@ -223,6 +223,8 @@ class Text{
         this.text = text;
         this.position = position +1;
         this.changed = false;
+        this.title_el;
+        this.text_el;
     }
     todict() {
         let data = {
@@ -241,21 +243,22 @@ class Text{
         let text_title = document.createElement("div");
         text_title.classList.add("subheading");
         text_title.innerHTML = this.title;
+        this.title_el = text_title;
         text_box.append(text_title)
-
+        
         let title_help = document.createElement("p");
         title_help.classList.add("help", "helpitem");
         title_help.innerHTML = "Titel (wird nicht auf Website angezeigt)";
         text_box.append(title_help);
-
+        
         //text content
         let content = document.createElement("div");
         content.classList.add("textbox");
         content.innerHTML = this.text;
         text_box.addEventListener('input', () => {this.changed=true});
-        
-        
+        this.text_el = content;
         text_box.append(content);
+
         let button = new Button([text_title, content], this)
         console.log(button);
         text_box.append(button);
@@ -265,7 +268,13 @@ class Text{
 
     save() {
         if (this.changed === true) {
+            this.text = this.text_el.innerHTML;
+            console.log(this.text)
+            console.log(this.text_el.innerHTML)
+            this.title = this.title_el.innerHTML;
+
             let data = this.todict()
+            console.log("hex")
 
             fetch('http://localhost:5000/api/texts/', {
                     method: 'PUT',
@@ -276,12 +285,13 @@ class Text{
                 }).then(response => {
                     if (response.status === 201){
                         // what happens if texts are saved?
-                        console.log(response)
+                        console.log(response.data)
                     }
                     else {
                         alert("We couldn't save the texts")
                     }
                 })
+            this.changed = false;
             }       
         }
     }
@@ -300,7 +310,8 @@ let Button = function(targetElements, textElement) {
             this.targets[target].contentEditable = 'true';
         }
         this.el.innerHTML = "Sichern";
-        this.el.addEventListener('click', () => {this.save();
+        this.el.addEventListener('click', () => {
+            this.save();
             textElement.save();});
     };
     this.save = function() {

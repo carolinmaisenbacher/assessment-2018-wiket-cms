@@ -21,8 +21,11 @@ class Owner(db.Model):
                 last_name = last_name,
                 email = email,
                 # prevents double encoding by the database
-                password =generate_password_hash(password)
-                # password = hashe
+                password =generate_password_hash(password),
+                
+                # still needs to be done.
+                
+                restaurant_id= 1
             )
             db.session.add(owner)
             db.session.commit()

@@ -1,17 +1,16 @@
 from app.api import blueprint as bp
+from app import db
 from flask import jsonify, request, abort, make_response
-from app.main.models import Text, TextActive
-from app.authentification.sessions import is_logged_in
+from app.main.models import TextActive
+from app.authentification.sessions import is_authorized
 
 @bp.route('/texts/', methods=['PUT'])
 def update_texts():
-    if not is_logged_in(request):
-        return make_response("You are authorized to change this text", 401)
+    print(request.json)
     if not request.json:
         abort(400)
-    id = request.json.get("id")
-
-    # text = [text for text in texts if text['id'] == text_id]
+    if not 'id' in request.json and type(request.json['id']) != unicode:
+        abort(400)
     if not 'title' in request.json and type(request.json['title']) != unicode:
         abort(400)
 
@@ -20,5 +19,17 @@ def update_texts():
 
     if not 'position' in request.json and type(request.json['position']) is not int:
         abort(400)
-    text = Text.query.get_or_404(id)
-    return make_response(jsonify({"success": "Hallo"}), 201)
+    
+    data = request.json
+    text = TextActive.query.filter(TextActive.text_id==data["id"]).first()
+
+    owner_information = is_authorized(request, text.restaurant_id)
+    if owner_information == False:
+        return make_response("You are not authorized to change this text, maybe try to log in.", 401)
+
+    text.from_dict(data)
+    db.session.commit()
+    
+    changed_text = text.to_dict()
+    print(changed_text)
+    return make_response(jsonify(changed_text), 201)

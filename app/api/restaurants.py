@@ -1,7 +1,6 @@
 from app.api import blueprint as bp
 from flask import jsonify
 from app.main.models import Restaurant
-from app.authentification.sessions import is_valid_sessionId
 
 @bp.route('/restaurants/<int:id>', methods=['GET'])
 def get_restaurant(id):
