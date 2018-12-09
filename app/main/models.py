@@ -49,6 +49,14 @@ class Text(db.Model):
         }
         return data
 
+    def from_dict(self, data):
+        for field in ['title', 'text']:
+            if field in data:
+                setattr(self, field, data[field])
+        db.session.add(self)
+
+
+
     def __repr__(self):
         return '<Text {}: {}>'.format(self.id, self.title)
 
@@ -59,6 +67,14 @@ class TextActive(db.Model):
 
     def to_dict(self):
         return self.text.to_dict()
+
+    def from_dict(self, data):
+        for field in ['position']:
+            if field in data:
+                setattr(self, field, data[field])
+
+        self.text.from_dict(data)
+        db.session.add(self)
 
     def __repr__(self):
         return '<Active Text {}: {}>'.format(self.id, self.text.title)
@@ -85,6 +101,7 @@ class Restaurant(db.Model):
     city = db.Column(db.String(120), nullable=False)
     # texts_active = db.relationship('Text', secondary=texts_active, lazy='joined', backref=db.backref('pages', lazy=True))
 
+    owners = db.relationship('Owner', backref='restaurant',lazy=True)
     menu_paragraphs = db.relationship('MenuParagraph', backref='restaurant',lazy='joined')
     dishes = db.relationship('Dish', backref='restaurant',lazy=True)
     texts = db.relationship('Text', backref='restaurant',lazy=True)

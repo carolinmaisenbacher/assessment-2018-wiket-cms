@@ -1,0 +1,5 @@
+id,first_name,last_name,email,password, restaurant_id
+1,Zeus,God,zeus@god.com,god,1
+2,Damian,Hutter,damian@wiket.de,wiket,2
+3,Karl,Hutter,karl@pur.de,pur,2
+4,Benni,Arnswald,benni@zweierlei.de,zweierlei,3
