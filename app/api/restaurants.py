@@ -1,5 +1,5 @@
 from app.api import blueprint as bp
-from flask import jsonify
+from flask import jsonify, make_response
 from app.main.models import Restaurant
 
 @bp.route('/restaurants/<int:id>', methods=['GET'])
@@ -8,4 +8,4 @@ def get_restaurant(id):
 
 @bp.route('/restaurants', methods=['GET'])
 def get_restaurants():
-    return jsonify(Restaurant.collection_dict())
+    return make_response(jsonify(Restaurant.collection_dict()),200)

@@ -7,18 +7,24 @@
     <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet"> 
     <link rel="stylesheet" href="../static/reset.css" />
     <link rel="stylesheet" href="../static/cms.css">
+    <script src="../static/signup.js"></script>
     <title>Document</title>
 </head>
 <body>
     <h1>Please signup!</h1>
     <form id="form" action="/signup" method="post" >
-        <input type="text" placeholder="firstname" name="first_name">
+        <input type="text" placeholder="firstname" name="first_name" required="true">
         <br>
-        <input type="text" placeholder="lastname" name="last_name">
+        <input type="text" placeholder="lastname" name="last_name" required="true">
         <br>
-        <input type="text" placeholder="email" name="email">
+        <input type="text" placeholder="email" name="email" required="true">
         <br>
-        <input type="password" placeholder="password" name="password">
+        <input type="password" placeholder="password" name="password" required="true">
+        <br>
+        <label>Select the Restaurant you are part of</label>
+        <br>
+        <select form="form" type="select" id="restaurants" name="restaurant_id" required="true">
+        </select> 
         <br>
         <button type="submit">submit!</button>
     </form>

@@ -45,7 +45,10 @@ class Text(db.Model):
             'id' : self.id,
             'title' : html.unescape(self.title),
             'text' : html.unescape(self.text),
-            'created' : self.created
+            'created' : self.created,
+            '_links' : {
+                'self' : url_for('api.update_texts', id=self.id)
+            }
         }
         return data
 
@@ -130,7 +133,8 @@ class Restaurant(db.Model):
             'menu' : self._menu_to_sorted_array(),
             '_links' : 
                 {
-                    'self' : url_for('api.get_restaurant', id=self.id),
+                    'self_data' : url_for('api.get_restaurant', id=self.id),
+                    'self_website' : url_for('main.index', id=self.id)
                 }   
             
         }
@@ -160,6 +164,7 @@ class Restaurant(db.Model):
                 'total_items' : len(restaurants), 
             }
         }
+        print("hey")
         return data
 
     def from_dict(self, data):

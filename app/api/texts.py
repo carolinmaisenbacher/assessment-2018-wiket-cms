@@ -4,9 +4,9 @@ from flask import jsonify, request, abort, make_response
 from app.main.models import TextActive
 from app.authentification.sessions import is_authorized
 
-@bp.route('/texts/', methods=['PUT'])
-def update_texts():
-    print(request.json)
+@bp.route('/texts/<int:id>', methods=['PUT'])
+def update_texts(id):
+    text = TextActive.query.filter(TextActive.text_id==id).first()
     if not request.json:
         abort(400)
     if not 'id' in request.json and type(request.json['id']) != unicode:
@@ -21,7 +21,7 @@ def update_texts():
         abort(400)
     
     data = request.json
-    text = TextActive.query.filter(TextActive.text_id==data["id"]).first()
+    
 
     owner_information = is_authorized(request, text.restaurant_id)
     if owner_information == False:
