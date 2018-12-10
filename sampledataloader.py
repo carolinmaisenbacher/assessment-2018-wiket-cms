@@ -3,17 +3,16 @@ import psycopg2
 import sample_datasets
 
 standby = { 
-      "text_active" : "sample_datasets/dataset_text_active.csv",
-    "owner" : "sample_datasets/dataset_owner.csv",
-"restaurant" : "sample_datasets/dataset_restaurant.csv",
-"text" : "sample_datasets/dataset_text.csv",
-"menuparagraph" : "sample_datasets/dataset_menuparagraph.csv",
-            "dish" : "sample_datasets/dataset_dish.csv",
-            "dish_variant" : "sample_datasets/dataset_dish_variant.csv",
 }
 
 datasets = {
-            "owner" : "sample_datasets/dataset_owner.csv"
+             "owner" : "sample_datasets/dataset_owner.csv",
+"restaurant" : "sample_datasets/dataset_restaurant.csv",
+"text" : "sample_datasets/dataset_text.csv",
+"text_active" : "sample_datasets/dataset_text_active.csv",
+"menuparagraph" : "sample_datasets/dataset_menuparagraph.csv",
+            "dish" : "sample_datasets/dataset_dish.csv",
+            "dish_variant" : "sample_datasets/dataset_dish_variant.csv"
 }
 
 def load_csv(table_name, file, connection): 
