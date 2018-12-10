@@ -1,12 +1,14 @@
 const url_local = 'http://localhost:5000/';
 
+
 window.onload = function(){
     getRestaurant();
+    console.log(restaurant_id)
 }
 
 
 function getRestaurant() {
-fetch(url_local + "api/restaurants/3")
+fetch(url_local + "api/restaurants/" + restaurant_id)
 .then(response => {
     if (response.status === 200) {
         return response.json()
@@ -83,10 +85,6 @@ function buildWebsiteContent(data) {
         title.className = "subheading";
         menu_heading.append(title)
         myContainer.append(menu_heading)
-
-
-
-        console.log(data)
 
         
         for(let i = 0, len = data.menu.length; i < len; i++){

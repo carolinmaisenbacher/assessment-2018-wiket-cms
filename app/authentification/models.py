@@ -15,7 +15,7 @@ class Owner(db.Model):
         return '<Owner {}>'.format(self.email) 
 
     @classmethod
-    def create_owner(cls, first_name, last_name, email, password):
+    def create_owner(cls, first_name, last_name, email, password, restaurant_id):
         try:
             owner = Owner(first_name = first_name,
                 last_name = last_name,
@@ -25,7 +25,7 @@ class Owner(db.Model):
                 
                 # still needs to be done.
                 
-                restaurant_id= 1
+                restaurant_id= restaurant_id
             )
             db.session.add(owner)
             db.session.commit()

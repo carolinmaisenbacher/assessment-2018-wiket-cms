@@ -1,4 +1,4 @@
-const url_local = 'http://localhost:5000/';
+const url_local = 'http://localhost:5000';
 let res_data;
 
 window.onload = function(){
@@ -7,7 +7,7 @@ window.onload = function(){
 document.execCommand("defaultParagraphSeparator", false, "br")
 
 function getRestaurant() {
-fetch(url_local + "api/restaurants/3")
+fetch(url_local + "/api/restaurants/" + restaurant_id)
 .then(response => {
     if (response.status === 200) {
         return response.json()
@@ -149,14 +149,14 @@ class TextManager {
     constructor(raw_texts){
         this.texts = [];
         for(let i = 0, n = raw_texts.length; i < n; i++){
-            this.texts.push(new Text(raw_texts[i].id, raw_texts[i].title, raw_texts[i].text, i))
+            this.texts.push(new Text(raw_texts[i].id, raw_texts[i].title, raw_texts[i].text, i, raw_texts[i]._links.self ))
         }
     }
     
     display() {
         if(view_active === false){
             this._displayTexts()
-            }else {
+            }else{
                 exitDisplay();
                 this._displayTexts();
             };
@@ -189,35 +189,9 @@ class TextManager {
             }
             myContainer.append(text_container);
     }
-    
-    save() {
-        let data = []
-        for(let i = 0, n = this.texts.length; i < n; i++){
-            if (this.texts[i].changed) {
-                data.push(this.texts[i].todict())
-            }
-        }
-
-        fetch('http://localhost:5000/api/texts/', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type' : 'application/json'
-                }, 
-                body: JSON.stringify(data)
-            }).then(response => {
-                console.log(response)
-                if (response.status === 201){
-                    console.log("huray")
-                }
-                else {
-                    alert("We couldn't save the texts")
-                }
-            })
-        }
-    }
-
+}
 class Text{
-    constructor(id, title, text, position){
+    constructor(id, title, text, position, url){
         this.id = id;
         this.title = title;
         this.text = text;
@@ -225,6 +199,7 @@ class Text{
         this.changed = false;
         this.title_el;
         this.text_el;
+        this.url = url;
     }
     todict() {
         let data = {
@@ -269,14 +244,11 @@ class Text{
     save() {
         if (this.changed === true) {
             this.text = this.text_el.innerHTML;
-            console.log(this.text)
-            console.log(this.text_el.innerHTML)
             this.title = this.title_el.innerHTML;
-
             let data = this.todict()
-            console.log("hex")
+       
 
-            fetch('http://localhost:5000/api/texts/', {
+            fetch((url_local + this.url), {
                     method: 'PUT',
                     headers: {
                         'Content-Type' : 'application/json'

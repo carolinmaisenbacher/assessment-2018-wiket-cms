@@ -23,6 +23,7 @@ def create_user():
 
     first_name = request.json['first_name']
     last_name = request.json['last_name']
+    restaurant_id = request.json['restaurant_id']
 
     if not first_name or not last_name:
         return make_response(jsonify({"error": "You have to provide a First and a Lastname"}), 401)
@@ -30,7 +31,7 @@ def create_user():
     if Owner.query.filter(Owner.email==email).first():
         return make_response(jsonify({"error": "You already exist, please log in"}), 401)
 
-    new_owner = Owner.create_owner(first_name=first_name, last_name=last_name, email=email, password=password)
+    new_owner = Owner.create_owner(first_name=first_name, last_name=last_name, email=email, password=password, restaurant_id=restaurant_id)
  
     response = make_response("user created", 201)
     return login_user(new_owner, response)
