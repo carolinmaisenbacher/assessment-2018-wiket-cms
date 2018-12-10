@@ -95,14 +95,20 @@ go to `app` and have a look at them
 
 1. main
 in main.models all the database models for the restaurant are defined.
+
 in main.routes the routes that are interesting for a user are defined, so `/` and `/login` `/admin` and so on.
 
 2. authentification
 this part is responsible to handle the state of the user, to log them in, to check whether their session is still valid.
+
 in authentification.models the owner model is defined.
+
 in authentification.routes are the apis provided with which you can login. 
+
 all the routes have the prefix `/auth/` in case you want to visit them. I was not sure if a login is usually handled via an api, that is why I build two different kinds of logins and signups. One using the api -> `/login-api` and `/signup-api` (defined in main.routes) 
+
 and one using normal forms (but the form validation is missing) -> `/login` and `/signup`
+
 Both are working.
 
 in authentification.sessions
