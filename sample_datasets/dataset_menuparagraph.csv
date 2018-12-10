@@ -1,0 +1,15 @@
+id,title,restaurant_id,description,position
+1,Kalte Vorspeisen ,1,,1
+2,Warme Vorspeisen,1,,2
+3,Salate,1,,3
+4,Warme Gerichte,1,,4
+5,Dessert,1,,5
+6,Suppen und Vorspeisen,2,,1
+7,Flammkuchen und Salat,2,,2
+8,Hauptakt,2,,3
+9,Vorspeisen,3,,1
+10,Suppen,3,,2
+11,Zwischengerichte,3,,3
+12,Sorbet,3,,4
+13,Hauptgerichte,3,,5
+14,Der Abschluss,3,,6
