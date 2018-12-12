@@ -14,7 +14,7 @@ def logout(sessionId):
         return False
     return True
     
-
+    
 def is_logged_in(request):
     try:
         sessionId = int(request.cookies.get("sessionId"))

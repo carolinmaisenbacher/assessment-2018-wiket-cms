@@ -120,7 +120,7 @@ class Restaurant(db.Model):
     def _active_texts_to_sorted_array(self):
         self.texts_active.sort()
         return [text.to_dict() for text in self.texts_active]
-
+  
     def to_dict(self):
         
         data = {

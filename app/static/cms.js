@@ -75,24 +75,6 @@ function initialView(data) {
     myContainer.append(navigation)
 }
 
-// Manager = () => {
-//     title;
-//     function display(){};
-//     function save(){};
-
-// }
-
-// class Manager {
-//     constructor(title, div) {
-//         this.title = make;
-//         this.menudiv = div;
-//     }
-// }
-
-// Manager.prototype.display = function() {
-//     console.log("hey there")
-// }
-
 function exitDisplay() {
     clearView()
     initialView(res_data)
